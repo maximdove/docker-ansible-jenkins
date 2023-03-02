@@ -22,13 +22,13 @@ pipeline{
             }
        }
        
-       stage('Docker Build'){
+       stage('Build Docker Image'){
             steps{
                 sh "docker build . -t maximdove/docker-ansible-jenkins:${DOCKER_TAG} "
             }
         }
         
-        stage('DockerHub Push'){
+        stage('Publish Docker Image'){
             steps{
                 withCredentials([string(credentialsId: 'docker-hub', variable: 'dockerHubPwd')]) {
                     sh "docker login -u maximdove -p ${dockerHubPwd}"
@@ -38,7 +38,7 @@ pipeline{
             }
         }
         
-        stage('Docker Deploy'){
+        stage('Run Docker Image'){
             steps{
               ansiblePlaybook credentialsId: 'dev-server3', disableHostKeyChecking: true, extras: "-e DOCKER_TAG=${DOCKER_TAG}", installation: 'ansible', inventory: 'dev.inv', playbook: 'deploy-docker.yml'
             }
